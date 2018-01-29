@@ -1,5 +1,5 @@
 # nowshowing
-Node scraper for local movie theatre showtimes
+Node.js scraper for local movie theatre showtimes
 
 ### Basic Usage:
 ```
