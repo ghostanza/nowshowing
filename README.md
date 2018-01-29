@@ -7,9 +7,9 @@ node movies.js -[flags]
 ```
 
 ### Flags:
-#### `-b` - Brattle Theatre
-#### `-c` - Coolidge Theatre
-#### `-s` - Somerville Theatre
+#### `-b` - [Brattle Theatre](http://www.brattlefilm.org/)
+#### `-c` - [Coolidge Theatre](http://www.coolidge.org/)
+#### `-s` - [Somerville Theatre](http://somervilletheatre.com/)
 
 ***Can be used together (ex: `node movies.js -bcs` ,`node movies.js -sc`, `node movies.js -s -b`)***
 
