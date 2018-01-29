@@ -11,13 +11,18 @@ let functions = {
 for (i in args) {
   args[i][0]=='-' && flags.push(...args[i].slice(1).split(''))
 }
-
-for(f in flags){
-  if(functions[flags[f]]){
-    functions[flags[f]].call();
+if(flags.length){
+  for(f in flags){
+    if(functions[flags[f]]){
+      functions[flags[f]].call();
+    }
   }
 }
-
+else{
+  for(fn in functions){
+    functions[fn].call();
+  }
+}
 
 function somerville(){
   let som = ' ';
