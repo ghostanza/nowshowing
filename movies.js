@@ -1,17 +1,16 @@
 const http = require('http');
+const https = require('https');
 const args = process.argv.slice(2);
 let flags = [];
 let functions = {
-  s: somerville,
+  b: brattle,
   c: coolidge,
-  b: brattle
+  k: kendall,
+  s: somerville
 }
 for (i in args) {
   args[i][0]=='-' && flags.push(...args[i].slice(1).split(''))
 }
-let som = ' ';
-let br = ' ';
-let co = ' ';
 
 for(f in flags){
   if(functions[flags[f]]){
@@ -21,9 +20,10 @@ for(f in flags){
 
 
 function somerville(){
+  let som = ' ';
   http.get('http://somervilletheatre.com/', (res) => {
-    res.on('data', (d)=>{
-      som+=`${d}`;
+    res.on('data', (c)=>{
+      som+=`${c}`;
     }).on('end', ()=>{
       let somMovieMarkup = som.match(/show\-name.*?movie.*?\<\/div/g);
       console.log("\n==================\n  SOMERVILLE:\n==================");
@@ -43,6 +43,7 @@ function somerville(){
   });
 }
 function brattle(){
+  let br = ' ';
   http.get('http://www.brattlefilm.org/', (res) => {
     res.on('data', (c) => {
         br+=`${c}`;
@@ -67,12 +68,13 @@ function brattle(){
 }
 
 function coolidge(){
+  let co = ' ';
   http.get('http://www.coolidge.org/', (res) => {
     res.on('data', (c) => {
         co+=`${c}`;
     }).on('end', ()=>{
       co = co.replace(/[\n\t]/g, '');
-      console.log("\n==================\n  COOLIDGE:\n==================")
+      console.log("\n==================\n  COOLIDGE:\n==================");
       let coMovieMarkup = co.match(/title-list-item.*?<hr/g);
       let coTimeMatch;
       let coTitleReg = new RegExp('film-event-title.*?\<a.*?\>(.*?)\<\/a','g');
@@ -86,8 +88,48 @@ function coolidge(){
               console.log(`  ${coTimeMatch[1]}`);
             }
           }
-          console.log('----------------')
+          console.log('----------------');
         }
+      }
+    });
+  });
+}
+
+function kendall(){
+  let ken = ' ';
+  let date = new Date().toISOString().slice(0,10);
+  https.get('https://www.landmarktheatres.com/boston/kendall-square-cinema', (res) => {
+    res.on('data', (c) => {
+      ken+=`${c}`;
+    }).on('end', ()=>{
+      console.log("\n==================\n  KENDALL:\n==================")
+      ken = ken.replace(/[\n\t]/g, '');
+      let k = ken.match(/filmData.*?[\s\S]*?\}\]\;/g)[0];
+      if(k.length){
+        k = k.replace('filmData = ', '');
+        k = k.substr(0,k.length-1);
+        k = k.replace("\\'", '');
+        k = k.replace(/\<.*?\>/g, '');
+      }
+      try{
+        let p = JSON.parse(k);
+        if(p && p.length){
+          p.forEach((i) => {
+            for(t in i['Sessions']){
+              let s = i['Sessions'][t];
+              if(s['NewDate'] == date){
+                console.log(`  ${i['Title']}${i['Cert'] ? ` (${i['Cert']})` : ''}`);
+                for(let m in s['Times']){
+                  console.log(`  ${s['Times'][m]['StartTime']}`);
+                }
+                console.log('----------------');
+              }
+            }
+          });
+        }
+      }
+      catch(err){
+        console.log("ERROR PARSING");
       }
     });
   });
